@@ -60,38 +60,32 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              child: InAppWebView(
-                initialUrlRequest: URLRequest(
-                  url: WebUri('http://localhost:3000'),
-                ),
-                onWebViewCreated: (controller) {
-                  _webViewController = controller;
-                  _webViewController!.addJavaScriptHandler(
-                    handlerName: 'handlerFoo',
-                    callback: (arguments) {
-                      final billData = arguments[0];
-                      setState(() {
-                        ipData = billData['ip'].toString();
-                        port = billData['port'];
-                        String base64Image = billData['image'].split(',')[1];
-                        imageBytes = base64Decode(base64Image);
-                        printTicketHello();
-                      });
-                      return {"status": "success", "data": arguments};
-                    },
-                  );
-                },
-                onConsoleMessage: (controller, consoleMessage) {
-                  debugPrint(consoleMessage.message);
-                },
-              ),
-            ),
+      body: SafeArea(
+        child: InAppWebView(
+          initialUrlRequest: URLRequest(
+            url: WebUri('https://staging.restaurant.appzap.la/'),
           ),
-        ],
+          onWebViewCreated: (controller) {
+            _webViewController = controller;
+            _webViewController!.addJavaScriptHandler(
+              handlerName: 'handlerFoo',
+              callback: (arguments) {
+                final billData = arguments[0];
+                setState(() {
+                  ipData = billData['ip'].toString();
+                  port = billData['port'];
+                  String base64Image = billData['image'].split(',')[1];
+                  imageBytes = base64Decode(base64Image);
+                  printTicketHello();
+                });
+                return {"status": "success", "data": arguments};
+              },
+            );
+          },
+          onConsoleMessage: (controller, consoleMessage) {
+            debugPrint(consoleMessage.message);
+          },
+        ),
       ),
     );
   }
