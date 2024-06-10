@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -19,10 +20,12 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   String? ipData = "";
   int? port;
   Uint8List? imageBytes;
+  bool isPrinting = false;
+  final Queue<Map<String, dynamic>> _printQueue = Queue();
 
   void handleData(Map<String, dynamic> billData) {}
 
-  Future<void> printTicketHello() async {
+  Future<void> printTicketBillData() async {
     List<int> ticket = await generateTicket();
     await printTicket(ticket, ipData);
   }
@@ -57,11 +60,42 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     return ticket;
   }
 
+  void _enqueuePrintRequest(Map<String, dynamic> billData) {
+    _printQueue.add(billData);
+    if (!isPrinting) {
+      _processNextPrintRequest();
+    }
+  }
+
+  Future<void> _processNextPrintRequest() async {
+    if (_printQueue.isEmpty) {
+      return;
+    }
+
+    isPrinting = true; // Set the flag to indicate printing in progress
+    final billData = _printQueue.removeFirst();
+    ipData = billData['ip'].toString();
+    port = billData['port'];
+    String base64Image = billData['image'].split(',')[1];
+    imageBytes = base64Decode(base64Image);
+
+    try {
+      List<int> ticket = await generateTicket();
+      await printTicket(ticket, ipData);
+    } finally {
+      isPrinting = false; // Reset the flag after printing is done
+      _processNextPrintRequest(); // Process the next print request
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: InAppWebView(
+          onCreateWindow: (controller, createWindowAction) async {
+            return true;
+          },
           initialUrlRequest: URLRequest(
             url: WebUri('https://staging.restaurant.appzap.la/'),
           ),
@@ -70,14 +104,23 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             _webViewController!.addJavaScriptHandler(
               handlerName: 'handlerFoo',
               callback: (arguments) {
-                final billData = arguments[0];
-                setState(() {
-                  ipData = billData['ip'].toString();
-                  port = billData['port'];
-                  String base64Image = billData['image'].split(',')[1];
-                  imageBytes = base64Decode(base64Image);
-                  printTicketHello();
-                });
+                if (!isPrinting) {
+                  setState(() {
+                    isPrinting = true;
+                  });
+
+                  final billData = arguments[0];
+                  setState(() {
+                    ipData = billData['ip'].toString();
+                    port = billData['port'];
+                    String base64Image = billData['image'].split(',')[1];
+                    imageBytes = base64Decode(base64Image);
+                    printTicketBillData();
+                  });
+                  setState(() {
+                    isPrinting = false;
+                  });
+                }
                 return {"status": "success", "data": arguments};
               },
             );
