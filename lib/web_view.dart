@@ -93,7 +93,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('http://localhost:3000/'),
+            url: WebUri('http://staging.restaurant.appzap.la/'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
