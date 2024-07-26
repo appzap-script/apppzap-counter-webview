@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -21,9 +20,34 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   int? port;
   Uint8List? imageBytes;
   bool isPrinting = false;
-  final Queue<Map<String, dynamic>> _printQueue = Queue();
+  List<Map<String, dynamic>> printQueue = [];
 
-  void handleData(Map<String, dynamic> billData) {}
+  void handleData(Map<String, dynamic> billData) {
+    printQueue.add(billData);
+    processQueue();
+  }
+
+  Future<void> processQueue() async {
+    if (isPrinting || printQueue.isEmpty) return;
+
+    setState(() {
+      isPrinting = true;
+    });
+
+    final billData = printQueue.removeAt(0);
+    ipData = billData['ip'].toString();
+    String base64Image = billData['image'].split(',')[1];
+    imageBytes = base64Decode(base64Image);
+    
+    await printTicketBillData();
+
+    setState(() {
+      isPrinting = false;
+    });
+
+    // Process the next item in the queue
+    processQueue();
+  }
 
   Future<void> printTicketBillData() async {
     List<int> ticket = await generateTicket();
@@ -40,7 +64,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     }
   }
 
-  Future generateTicket() async {
+  Future<List<int>> generateTicket() async {
     List<int> ticket = [];
     final profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
@@ -60,34 +84,6 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     return ticket;
   }
 
-  void _enqueuePrintRequest(Map<String, dynamic> billData) {
-    _printQueue.add(billData);
-    if (!isPrinting) {
-      _processNextPrintRequest();
-    }
-  }
-
-  Future<void> _processNextPrintRequest() async {
-    if (_printQueue.isEmpty) {
-      return;
-    }
-
-    isPrinting = true; // Set the flag to indicate printing in progress
-    final billData = _printQueue.removeFirst();
-    ipData = billData['ip'].toString();
-    port = billData['port'];
-    String base64Image = billData['image'].split(',')[1];
-    imageBytes = base64Decode(base64Image);
-
-    try {
-      List<int> ticket = await generateTicket();
-      await printTicket(ticket, ipData);
-    } finally {
-      isPrinting = false; // Reset the flag after printing is done
-      _processNextPrintRequest(); // Process the next print request
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,30 +93,15 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('https://staging.restaurant.appzap.la/'),
+            url: WebUri('http://localhost:3000/'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
             _webViewController!.addJavaScriptHandler(
               handlerName: 'handlerFoo',
               callback: (arguments) {
-                if (!isPrinting) {
-                  setState(() {
-                    isPrinting = true;
-                  });
-
-                  final billData = arguments[0];
-                  setState(() {
-                    ipData = billData['ip'].toString();
-                    port = billData['port'];
-                    String base64Image = billData['image'].split(',')[1];
-                    imageBytes = base64Decode(base64Image);
-                    printTicketBillData();
-                  });
-                  setState(() {
-                    isPrinting = false;
-                  });
-                }
+                final billData = arguments[0];
+                handleData(billData);
                 return {"status": "success", "data": arguments};
               },
             );
