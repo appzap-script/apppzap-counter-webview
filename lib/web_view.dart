@@ -38,13 +38,13 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     ipData = billData['ip'].toString();
     String base64Image = billData['image'].split(',')[1];
     imageBytes = base64Decode(base64Image);
-    
+
     await printTicketBillData();
 
     setState(() {
       isPrinting = false;
     });
-
+    await Future.delayed(const Duration(seconds: 2));
     // Process the next item in the queue
     processQueue();
   }
