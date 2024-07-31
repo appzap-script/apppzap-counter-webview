@@ -44,7 +44,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     setState(() {
       isPrinting = false;
     });
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     // Process the next item in the queue
     processQueue();
   }
@@ -93,7 +93,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('https://staging.restaurant.appzap.la/'),
+            url: WebUri('https://restaurant.appzap.la/'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;

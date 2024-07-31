@@ -37,6 +37,7 @@ dependencies:
   image: ^4.1.7
   esc_pos_utils_plus: ^2.0.3
   flutter_launcher_icons: ^0.13.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
