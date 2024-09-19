@@ -18,6 +18,9 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   InAppWebViewController? _webViewController;
   String? ipData = "";
   int? port;
+  int? paper;
+  int? beep;
+  int? beepLong;
   Uint8List? imageBytes;
   bool isPrinting = false;
   List<Map<String, dynamic>> printQueue = [];
@@ -36,6 +39,8 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
 
     final billData = printQueue.removeAt(0);
     ipData = billData['ip'].toString();
+    paper = billData['width'];
+    beep = billData['beep'];
     String base64Image = billData['image'].split(',')[1];
     imageBytes = base64Decode(base64Image);
 
@@ -66,16 +71,17 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
 
   Future<List<int>> generateTicket() async {
     List<int> ticket = [];
+
     final profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
 
     final image = img.decodeImage(imageBytes!);
+    ticket += generator.beep(n: beep!, duration: PosBeepDuration.beep450ms);
     if (image != null) {
-      img.adjustColor(image,
-          contrast: 1); // Adjust the contrast factor as needed
+      img.adjustColor(image, contrast: 1);
       final grayscaleImage = img.grayscale(image);
       final resizedImage =
-          img.copyResize(grayscaleImage, width: 550); // Adjust width as needed
+          img.copyResize(grayscaleImage, width: paper); // ຂະໝາດບີນ 58 ແລະ 80
       ticket += generator.imageRaster(resizedImage);
     }
 
@@ -93,7 +99,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('https://restaurant.appzap.la/'),
+            url: WebUri('http://localhost:3000/'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
