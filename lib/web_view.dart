@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:appzap_counter_web_app/test_print.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
@@ -59,6 +60,11 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     await printTicket(ticket, ipData);
   }
 
+  Future<void> printTicketBillTest() async {
+    List<int> ticket = await printTestNetwork();
+    await printTicket(ticket, ipData);
+  }
+
   Future<void> printTicket(List<int> ticket, String? ip) async {
     final printer = PrinterNetworkManager(ip!);
     PosPrintResult printConnect = await printer.connect();
@@ -76,7 +82,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     final generator = Generator(PaperSize.mm80, profile);
 
     final image = img.decodeImage(imageBytes!);
-    ticket += generator.beep(n: beep!, duration: PosBeepDuration.beep450ms);
+    ticket += generator.beep(n: 1, duration: PosBeepDuration.beep450ms);
     if (image != null) {
       img.adjustColor(image, contrast: 1);
       final grayscaleImage = img.grayscale(image);
@@ -93,6 +99,15 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   actions: [
+      //     IconButton(
+      //         onPressed: () {
+      //           printTicketBillTest();
+      //         },
+      //         icon: Icon(Icons.abc))
+      //   ],
+      // ),
       body: SafeArea(
         child: InAppWebView(
           onCreateWindow: (controller, createWindowAction) async {
