@@ -41,7 +41,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     final billData = printQueue.removeAt(0);
     ipData = billData['ip'].toString();
     paper = billData['width'];
-    beep = billData['beep'];
+    // beep = billData['beep'];
     String base64Image = billData['image'].split(',')[1];
     imageBytes = base64Decode(base64Image);
 
@@ -62,7 +62,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
 
   Future<void> printTicketBillTest() async {
     List<int> ticket = await printTestNetwork();
-    await printTicket(ticket, ipData);
+    await printTicket(ticket, "192.168.110.190");
   }
 
   Future<void> printTicket(List<int> ticket, String? ip) async {
@@ -88,7 +88,8 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
       final grayscaleImage = img.grayscale(image);
       final resizedImage =
           img.copyResize(grayscaleImage, width: paper); // ຂະໝາດບີນ 58 ແລະ 80
-      ticket += generator.imageRaster(resizedImage);
+      // ticket += generator.imageRaster(resizedImage);
+      ticket += generator.image(resizedImage);
     }
 
     ticket += generator.cut();
@@ -99,22 +100,13 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   actions: [
-      //     IconButton(
-      //         onPressed: () {
-      //           printTicketBillTest();
-      //         },
-      //         icon: Icon(Icons.abc))
-      //   ],
-      // ),
       body: SafeArea(
         child: InAppWebView(
           onCreateWindow: (controller, createWindowAction) async {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('https://restaurant.appzap.la/'),
+            url: WebUri('http://localhost:3000/'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
