@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBhQMrGhH2y8EIMd6cN8mBnf7xQo2rDoYg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>833079826683</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.appzap.appzapCounterWebApp</string>
+	<key>PROJECT_ID</key>
+	<string>appzap-c37f9</string>
+	<key>STORAGE_BUCKET</key>
+	<string>appzap-c37f9.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:833079826683:ios:5011a366f5f213ce6b785e</string>
+</dict>
+</plist>

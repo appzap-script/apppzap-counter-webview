@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "833079826683",
+    "project_id": "appzap-c37f9",
+    "storage_bucket": "appzap-c37f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833079826683:android:366a5b87de1a32026b785e",
+        "android_client_info": {
+          "package_name": "com.appzap.appzapCounterWebApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833079826683-fd8eohq78acg25ij63cfv08nq7q648u0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6x-Yytxoo0CXeMfHRpvzzNIgC5YRJb7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833079826683-fd8eohq78acg25ij63cfv08nq7q648u0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

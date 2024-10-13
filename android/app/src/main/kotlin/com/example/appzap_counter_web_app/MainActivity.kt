@@ -1,4 +1,4 @@
-package com.example.appzap_counter_web_app
+package com.appzap.appzapCounterWebApp
 
 import io.flutter.embedding.android.FlutterActivity
 
