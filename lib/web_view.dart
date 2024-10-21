@@ -75,23 +75,30 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     }
   }
 
+  // Function to generate the ticket along with opening the cash drawer
   Future<List<int>> generateTicket() async {
     List<int> ticket = [];
 
     final profile = await CapabilityProfile.load();
     final generator = Generator(PaperSize.mm80, profile);
 
-    final image = img.decodeImage(imageBytes!);
     ticket += generator.beep(n: 1, duration: PosBeepDuration.beep450ms);
-    if (image != null) {
-      img.adjustColor(image, contrast: 1);
-      final grayscaleImage = img.grayscale(image);
-      final resizedImage =
-          img.copyResize(grayscaleImage, width: paper); // ຂະໝາດບີນ 58 ແລະ 80
-      // ticket += generator.imageRaster(resizedImage);
-      ticket += generator.image(resizedImage);
+
+    // Decode and process the image
+    if (imageBytes != null) {
+      final image = img.decodeImage(imageBytes!);
+      if (image != null) {
+        img.adjustColor(image, contrast: 1);
+        final grayscaleImage = img.grayscale(image);
+        final resizedImage = img.copyResize(grayscaleImage, width: paper);
+        ticket += generator.image(resizedImage);
+      }
     }
 
+    // Add the ESC/POS command to open the cash drawer
+    ticket += generator.drawer(pin: PosDrawer.pin2);
+
+    // Add cut command to finish the ticket
     ticket += generator.cut();
 
     return ticket;
