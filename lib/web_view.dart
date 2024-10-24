@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:appzap_counter_web_app/test_print.dart';
@@ -20,7 +21,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   String? ipData = "";
   int? port;
   int? paper;
-  int? beep;
+  bool? drawer;
   int? beepLong;
   Uint8List? imageBytes;
   bool isPrinting = false;
@@ -41,14 +42,15 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     final billData = printQueue.removeAt(0);
     ipData = billData['ip'].toString();
     paper = billData['width'];
+    drawer = billData['drawer'];
     // beep = billData['beep'];
     String base64Image = billData['image'].split(',')[1];
     imageBytes = base64Decode(base64Image);
-
     await printTicketBillData();
 
     setState(() {
       isPrinting = false;
+      log("message $drawer");
     });
     await Future.delayed(const Duration(seconds: 3));
     // Process the next item in the queue
@@ -56,7 +58,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   }
 
   Future<void> printTicketBillData() async {
-    List<int> ticket = await generateTicket();
+    List<int> ticket = await generateTicket(drawer);
     await printTicket(ticket, ipData);
   }
 
@@ -76,7 +78,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   }
 
   // Function to generate the ticket along with opening the cash drawer
-  Future<List<int>> generateTicket() async {
+  Future<List<int>> generateTicket(drawer) async {
     List<int> ticket = [];
 
     final profile = await CapabilityProfile.load();
@@ -95,8 +97,9 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
       }
     }
 
-    // Add the ESC/POS command to open the cash drawer
-    ticket += generator.drawer(pin: PosDrawer.pin2);
+    if (drawer != null && drawer == true) {
+      ticket += generator.drawer(pin: PosDrawer.pin2);
+    }
 
     // Add cut command to finish the ticket
     ticket += generator.cut();
