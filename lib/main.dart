@@ -1,4 +1,4 @@
-import 'package:appzap_counter_web_app/web_view.dart';
+import 'package:appzap_counter_web_app/app/routes/app_route.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,13 +10,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routeInformationProvider: AppRoute.router.routeInformationProvider,
+      routeInformationParser: AppRoute.router.routeInformationParser,
+      routerDelegate: AppRoute.router.routerDelegate,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const WebViewAppCounter(),
     );
   }
 }

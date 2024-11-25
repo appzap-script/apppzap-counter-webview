@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
+import 'package:appzap_counter_web_app/contanst.dart';
 import 'package:appzap_counter_web_app/test_print.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image/image.dart' as img;
 
 class WebViewAppCounter extends StatefulWidget {
@@ -64,7 +66,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
 
   Future<void> printTicketBillTest() async {
     List<int> ticket = await printTestNetwork();
-    await printTicket(ticket, "192.168.110.190");
+    await printTicket(ticket, "192.168.1.190");
   }
 
   Future<void> printTicket(List<int> ticket, String? ip) async {
@@ -110,6 +112,21 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.wifi),
+        onPressed: () {
+          context.go(Routes.setting);
+        },
+      ),
+      // appBar: AppBar(
+      //   actions: [
+      //     IconButton(
+      //         onPressed: () {
+      //           printTicketBillTest();
+      //         },
+      //         icon: Icon(Icons.abc))
+      //   ],
+      // ),
       body: SafeArea(
         child: InAppWebView(
           onCreateWindow: (controller, createWindowAction) async {
