@@ -47,14 +47,28 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     String base64Image = billData['image'].split(',')[1];
     imageBytes = base64Decode(base64Image);
     await printTicketBillData();
+    // await printTicketBillTest();
 
     setState(() {
       isPrinting = false;
-      log("message $drawer");
+      log("drawer $drawer");
     });
     await Future.delayed(const Duration(seconds: 3));
     // Process the next item in the queue
     processQueue();
+  }
+
+  Future<void> drawerPrint(drawer) async {
+    final billData = drawer;
+    log("billData: $billData");
+    ipData = billData['ip'].toString();
+    drawer = billData['drawer'];
+    await printDrawerTicket();
+  }
+
+  Future<void> printDrawerTicket() async {
+    List<int> ticket = await generateDrawer(drawer);
+    await printTicket(ticket, ipData);
   }
 
   Future<void> printTicketBillData() async {
@@ -63,8 +77,8 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
   }
 
   Future<void> printTicketBillTest() async {
-    List<int> ticket = await printTestNetwork();
-    await printTicket(ticket, "192.168.110.190");
+    List<int> ticket = await printTestNetwork(true);
+    await printTicket(ticket, ipData);
   }
 
   Future<void> printTicket(List<int> ticket, String? ip) async {
@@ -72,7 +86,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
     PosPrintResult printConnect = await printer.connect();
     if (printConnect == PosPrintResult.success) {
       PosPrintResult printing = await printer.printTicket(ticket);
-      debugPrint(printing.msg);
+      debugPrint("Connect suceess: ${printing.msg}");
       printer.disconnect();
     }
   }
@@ -97,13 +111,25 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
       }
     }
 
-    if (drawer != null && drawer == true) {
-      ticket += generator.drawer(pin: PosDrawer.pin2);
-    }
+    log("drawer: $drawer");
+
+    // if (drawer != null && drawer == true) {}
+
+    ticket += generator.drawer(pin: PosDrawer.pin2);
 
     // Add cut command to finish the ticket
+    ticket += generator.feed(2);
     ticket += generator.cut();
 
+    return ticket;
+  }
+
+  Future<List<int>> generateDrawer(drawer) async {
+    List<int> ticket = [];
+
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm80, profile);
+    ticket += generator.drawer(pin: PosDrawer.pin2);
     return ticket;
   }
 
@@ -125,6 +151,14 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
               callback: (arguments) {
                 final billData = arguments[0];
                 handleData(billData);
+                return {"status": "success", "data": arguments};
+              },
+            );
+            _webViewController!.addJavaScriptHandler(
+              handlerName: 'handlerName',
+              callback: (arguments) {
+                final drawer = arguments[0];
+                drawerPrint(drawer);
                 return {"status": "success", "data": arguments};
               },
             );
