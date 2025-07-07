@@ -113,9 +113,11 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
 
     log("drawer: $drawer");
 
-    // if (drawer != null && drawer == true) {}
+    if (drawer != null && drawer == true) {
+      ticket += generator.drawer(pin: PosDrawer.pin2); 
+    }
 
-    ticket += generator.drawer(pin: PosDrawer.pin2);
+    
 
     // Add cut command to finish the ticket
     ticket += generator.feed(2);
@@ -142,7 +144,7 @@ class _WebViewAppCounterState extends State<WebViewAppCounter> {
             return true;
           },
           initialUrlRequest: URLRequest(
-            url: WebUri('https://restaurant.appzap.la/'),
+            url: WebUri('http://localhost:3000'),
           ),
           onWebViewCreated: (controller) {
             _webViewController = controller;
