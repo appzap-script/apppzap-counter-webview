@@ -34,6 +34,8 @@ target 'Runner' do
   # Install all Flutter pods
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
+  pod 'gRPC-C++', '1.44.0'
+
   # Add Firebase pods here
   pod 'Firebase/Core'
   pod 'Firebase/Auth'
